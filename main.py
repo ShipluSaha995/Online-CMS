@@ -1,40 +1,86 @@
-from auth import login, reset_password
-from queries import run_query
-from student import view_students
-from course import view_courses
+from auth import login, reset_password, register_student, register_teacher
 from enrollment import enroll
 from payment import pay
-from teacher import my_courses, earnings
-
-role,user=login()
-
-if role is None:
-    if input("Reset? y/n: ")=='y':
-        reset_password()
-    role,user=login()
+from queries import run_query
+from admin import view_students, view_teachers, view_courses, add_course
+from teacher import my_courses, students_in_courses, earnings
 
 while True:
-    print("\n===== MENU =====")
+    print("\n===== SYSTEM =====")
+    print("1 Login")
+    print("2 Register Student")
+    print("3 Register Teacher")
+    print("4 Reset Password")
+    print("5 Exit")
 
-    if role=="admin":
-        print("1 Students\n2 Courses\n3 Queries\n4 Exit")
-        ch=int(input())
-        if ch==1: view_students()
-        elif ch==2: view_courses()
-        elif ch==3: run_query()
-        else: break
+    ch = int(input())
 
-    elif role=="student":
-        print("1 Courses\n2 Enroll\n3 Pay\n4 Exit")
-        ch=int(input())
-        if ch==1: view_courses()
-        elif ch==2: enroll(1)
-        elif ch==3: pay(1)
-        else: break
+    if ch == 1:
+        res = login()
+        if not res:
+            print("Invalid login")
+            continue
 
-    elif role=="teacher":
-        print("1 My Courses\n2 Earnings\n3 Exit")
-        ch=int(input())
-        if ch==1: my_courses(1)
-        elif ch==2: earnings(1)
-        else: break
+        role, sid, tid = res
+
+        # -------- ADMIN --------
+        if role == "admin":
+            while True:
+                print("\nADMIN MENU")
+                print("1 View Students")
+                print("2 View Teachers")
+                print("3 View Courses")
+                print("4 Add Course")
+                print("5 Run Queries")
+                print("6 Exit")
+
+                c = int(input())
+
+                if c==1: view_students()
+                elif c==2: view_teachers()
+                elif c==3: view_courses()
+                elif c==4: add_course()
+                elif c==5: run_query()
+                else: break
+
+        # -------- STUDENT --------
+        elif role == "student":
+            while True:
+                print("\nSTUDENT MENU")
+                print("1 Enroll")
+                print("2 Payment")
+                print("3 Exit")
+
+                c = int(input())
+
+                if c==1: enroll(sid)
+                elif c==2: pay(sid)
+                else: break
+
+        # -------- TEACHER --------
+        elif role == "teacher":
+            while True:
+                print("\nTEACHER MENU")
+                print("1 My Courses")
+                print("2 Students Count")
+                print("3 Earnings")
+                print("4 Exit")
+
+                c = int(input())
+
+                if c==1: my_courses(tid)
+                elif c==2: students_in_courses(tid)
+                elif c==3: earnings(tid)
+                else: break
+
+    elif ch == 2:
+        register_student()
+
+    elif ch == 3:
+        register_teacher()
+
+    elif ch == 4:
+        reset_password()
+
+    else:
+        break
